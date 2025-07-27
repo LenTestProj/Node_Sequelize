@@ -1,10 +1,13 @@
 const express=  require("express");
 const bodyParser = require("body-parser");
-const User = require("./models/user(alternate)");
-const Contact = require("./models/contact");
-const sequelize = require("./models");
+const userCtrl = require("./controllers/userController");
+const cors = require('cors');
+
 const app = express();
 require("./models");
+
+//CORS
+app.use(cors())
 
 //parse application json
 app.use(bodyParser.json())
@@ -13,11 +16,25 @@ app.get("/", function(req,res){
     res.send("Hello world")
 })
 
+app.get("/add", userCtrl.addUser)
+
+app.get("/users", userCtrl.getUsers);
+
+app.get("/users/:id",userCtrl.getUser)
+
+app.post("/user", userCtrl.postUser);
+
+app.post("/users", userCtrl.postUsers);
+
+app.delete("/user/:id", userCtrl.deleteUser);
+
+app.patch("/user/:id", userCtrl.patchUser);
+
 //temp
 // User.sync({force:true});
 // Contact.sync({force:true})
 // sequelize.sync({force:true})
 
-app.listen(6000,()=>{
-    console.log("Server listening on port 6000")
+app.listen(4000,()=>{
+    console.log("Server listening on port 4000")
 })

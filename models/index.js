@@ -1,8 +1,8 @@
-const {Sequelize} = require("sequelize");
-
+const {Sequelize, DataTypes, Model} = require("sequelize");
 const sequelize = new Sequelize("employee_db","root","root",{
     host:"localhost",
-    dialect:'mysql'
+    dialect:'mysql',
+    logging:false
 });
 
 const connectDB=async()=>{
@@ -17,8 +17,12 @@ const connectDB=async()=>{
 connectDB();
 
 const db = {};
-db.Sequelize = sequelize;
-db.
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
 
-module.exports = sequelize;
+db.contact = require("./contact")(sequelize, DataTypes);
+db.user = require("./user")(sequelize,DataTypes);
+db.sequelize.sync();
+
+module.exports = db;
 
