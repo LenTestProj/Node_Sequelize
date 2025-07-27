@@ -16,5 +16,9 @@ const connectDB=async()=>{
 
 connectDB();
 
+const db = {};
+db.Sequelize = sequelize;
+db.
+
 module.exports = sequelize;
 

@@ -1,6 +1,8 @@
 const express=  require("express");
 const bodyParser = require("body-parser");
 const User = require("./models/user(alternate)");
+const Contact = require("./models/contact");
+const sequelize = require("./models");
 const app = express();
 require("./models");
 
@@ -12,7 +14,9 @@ app.get("/", function(req,res){
 })
 
 //temp
-User.sync();
+// User.sync({force:true});
+// Contact.sync({force:true})
+// sequelize.sync({force:true})
 
 app.listen(6000,()=>{
     console.log("Server listening on port 6000")
