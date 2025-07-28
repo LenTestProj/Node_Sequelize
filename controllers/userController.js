@@ -1,4 +1,5 @@
-const db = require("../models")
+const db = require("../models");
+const {Sequelize,Op} = require("sequelize");
 const User = db.user;
 
 const addUser = async (req,res) =>{
@@ -93,6 +94,118 @@ const patchUser = async (req,res)=>{
     }
 }
 
+const queryUser = async (req,res)=>{
+    try {
+        //COUNT function obn db direectly
+        const data = await User.count({
+            where:{
+                id:{
+                    [Op.gt]:1
+                }
+            }
+        })
+
+        //SORT BY DESC, GROUP BY and offset and limit
+        // const data = await User.findAll({
+        //     attributes:[
+        //         "firstName",
+        //         [Sequelize.fn("COUNT",Sequelize.col("id")),'count'],
+        //         [Sequelize.fn("MAX", Sequelize.col("id")), "lastestId"]
+        //     ],            
+        //     group:"firstName",
+        //     order:[[Sequelize.fn("MAX",Sequelize.col("id")),"DESC"]],
+        //     offset:1,
+        //     limit:1
+        // })
+
+        //SORT BY DESC and GROUP BY
+        // const data = await User.findAll({
+        //     // order:[
+        //     //     ['id','DESC']
+        //     // ],
+        //     attributes:[
+        //         "firstName",
+        //         [Sequelize.fn("COUNT",Sequelize.col("id")),'count'],
+        //         [Sequelize.fn("MAX", Sequelize.col("id")), "lastestId"]
+        //     ],            
+        //     group:"firstName",
+        //     order:[[Sequelize.fn("MAX",Sequelize.col("id")),"DESC"]]
+        // })
+
+        //Operand
+        // const data = await User.findAll({
+        //     where:{
+        //         [Op.and]:[
+        //             {
+        //                  id:{
+        //                     [Op.eq]:1
+        //                 }
+        //             },
+        //             {
+        //                 firstName:{
+        //                     [Op.eq]:"alice123"
+        //                 }
+        //             }    
+        //         ] 
+        //     }
+        // })
+
+        //----- exclude certain fieilds -----
+        // const data = await User.findAll({
+        //     attributes: {
+        //         exclude:["lastName","id"]
+        //     }
+        // })
+
+        // ----- fetch only selected feilds adn add alias name -----
+        // const data = await User.findAll({
+        //     attributes:["id",["firstName","fName"]]
+        // })
+        
+        // ----- fetch only selected feilds ---------
+        // const data = await User.findAll({
+        //     attributes:["id","firstName"]
+        // })
+
+        //----- ONLY ADD SPECIFIC FIELDS ----------
+        // const data = await User.create({
+        //     firstName:"alice123",
+        //     lastName:"anderson"
+        // },{
+        //     fields:["firstName"]
+        // })
+        res.status(200).json({data:data});
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});    
+    }
+}
+
+const findersUsers = async (req,res)=>{
+    try {
+        //find and count
+        const {count,rows} = await User.findAndCountAll({
+            where:{firstName:{
+                [Op.startsWith]:"alic"
+            }}
+        })
+      
+
+        //find or create
+        // const [user,created] = await User.findOrCreate({
+        //     where:{firstName:"alicia"},
+        //     defaults:{
+        //         lastName: 'Keys'
+        //     }
+        // })
+
+        //Find by Pk
+        // const data = await User.findByPk(1);
+        res.status(200).json({data:rows, count:count});
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});    
+    }
+}
+
 module.exports={
     addUser,
     getUsers,
@@ -100,5 +213,7 @@ module.exports={
     postUser,
     postUsers,
     deleteUser,
-    patchUser
+    patchUser,
+    queryUser,
+    findersUsers
 }

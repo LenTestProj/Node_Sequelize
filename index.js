@@ -16,8 +16,6 @@ app.get("/", function(req,res){
     res.send("Hello world")
 })
 
-app.get("/add", userCtrl.addUser)
-
 app.get("/users", userCtrl.getUsers);
 
 app.get("/users/:id",userCtrl.getUser)
@@ -29,6 +27,10 @@ app.post("/users", userCtrl.postUsers);
 app.delete("/user/:id", userCtrl.deleteUser);
 
 app.patch("/user/:id", userCtrl.patchUser);
+
+app.get("/query", userCtrl.queryUser)
+
+app.get("/finders", userCtrl.findersUsers);
 
 //temp
 // User.sync({force:true});
