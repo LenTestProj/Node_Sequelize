@@ -7,7 +7,10 @@ module.exports = (sequelize, DataTypes)=>{
         current_address:{
             type:DataTypes.STRING,
             allowNull:false
-        }
+        },
+        // user_Id:{
+        //     type:DataTypes.INTEGER
+        // }
     },{
         //other optional options go here
     });

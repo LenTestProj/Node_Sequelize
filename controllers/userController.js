@@ -1,6 +1,7 @@
 const db = require("../models");
-const {Sequelize,Op} = require("sequelize");
+const {Sequelize,Op, QueryTypes} = require("sequelize");
 const User = db.user;
+const Contact = db.contact;
 
 const addUser = async (req,res) =>{
     // const newUser = User.build({firstName:'jane'});
@@ -206,6 +207,262 @@ const findersUsers = async (req,res)=>{
     }
 }
 
+const getSetVirtual =async(req,res)=>{
+    try {
+        //find and count
+        const {count,rows} = await User.findAndCountAll({
+            where:{firstName:{
+                [Op.startsWith]:"alic"
+            }}
+        })
+      
+        res.status(200).json({data:rows, count:count});
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});    
+    }
+}
+
+const validateUser = async(req,res)=>{
+    const data={}, messages={};
+    try {
+        const data = await User.create({
+            firstName:"Amar12",
+            lastName:"Joshi"
+        });
+        res.status(200).json({data:data});
+    } catch (e) {
+        // console.log(e.errors);
+        let message;
+        e.errors.forEach(error=>{
+            switch(error.validatorKey){
+                case 'isAlpha':
+                    message = 'Only alphabets are allowed';
+                    break;
+                case "isLowercase":
+                    message = 'Only Lower cases are allowed';
+                    break;    
+            }
+            messages[error.path]=message;
+        })
+        res.status(400).send({messages:messages,error:e});       
+    }
+}
+
+const rawQueries=async(req,res)=>{
+    try {
+        //Bind keywords
+        const users = await db.sequelize.query("SELECT * from users WHERE firstName=$fName AND lastName=$lName",{
+            bind:{fName:"Joel", lName:"Garner"},
+            type:QueryTypes.SELECT
+        })
+
+        //fetch IN keywords
+        // const users = await db.sequelize.query("SELECT * from users WHERE lastName LIKE ? AND firstName IN ('Joel','Chris')",{
+        //     replacements:["Gar%"],
+        //     type:QueryTypes.SELECT
+        // });
+
+        //fetch placeholders
+        // const users = await db.sequelize.query("SELECT * from users WHERE lastName LIKE ? AND (firstName like ? OR firstName like ?)",{
+        //     replacements:["Gar%","Jo%", "Chr%"],
+        //     type:QueryTypes.SELECT
+        // });
+
+        //basic fetch operations
+        // const users = await db.sequelize.query("SELECT * from users",{
+        //     type:QueryTypes.SELECT,
+        //     model:User, //optional
+        //     mapToModel:true //optional
+        // });  
+        res.status(200).json({data:users});  
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});    
+    }
+}
+
+const oneToOneUser=async(req,res)=>{
+    try {
+        // const data = await User.create({firstName:"Gurmeet", lastName:"singh"});
+        // if(data && data.id){
+        //     await Contact.create({
+        //         permanant_address:"abc",
+        //         current_address:"xyz",
+        //         user_id:data.id
+        //     })
+        // }
+
+        //fetchinig users and contacts foreign key
+        // const data = await User.findAll({
+        //     attributes:["firstName", "lastName"],
+        //     include:[{
+        //         model:Contact,
+        //         as:"contactDetails",
+        //         attributes:["permanant_address", "current_address"]
+        //     }],
+        //     where:{id:{
+        //         [Op.gt]:1
+        //     }}
+        // });
+
+        //fetching contacts
+        const data = await Contact.findAll({
+            attributes:["permanant_address", "current_address"],
+            include:[{
+                model:User,
+                as:"userDetails",
+                attributes:["firstName", "lastName"],
+            }],
+            where:{id:{
+                [Op.gt]:1
+            }}
+        });
+        res.status(200).json({data:data}); 
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});     
+    }
+}
+
+const oneToManyUser = async(req,res)=>{
+    try {
+        // const data = await Contact.create({permanant_address:"Gurugram", current_address:"Meerut", user_id:1});
+        // fetching users and contacts foreign key
+        // const data = await User.findAll({
+        //     attributes:["firstName", "lastName"],
+        //     include:[{
+        //         model:Contact,
+        //         as:"contactDetails",
+        //         attributes:["permanant_address", "current_address"]
+        //     }],
+        //     where:{id:{
+        //         [Op.gt]:1
+        //     }}
+        // });
+
+        //fetching contacts 
+        const data = await Contact.findAll({
+            attributes:["permanant_address", "current_address"],
+            include:[{
+                model:User,
+                as:"userDetails",
+                attributes:["firstName", "lastName"],
+            }],
+            where:{id:{
+                [Op.gt]:1
+            }}
+        });
+        res.status(200).json({data:data}); 
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});    
+    }
+}
+
+const manyToManyUser = async(req,res)=>{
+    try {
+        // const data = await User.create({firstName:"arun", lastName:"gupta"});
+        // if(data && data.id){
+        //     await Contact.create({
+        //         permanant_address:"noida",
+        //         current_address:"hapur",
+        //     })
+        // }  
+
+        //fetching contacts
+        // const data = await Contact.findAll({
+        //     attributes:["permanant_address", "current_address"],
+        //     include:[{
+        //         model:User,
+        //         attributes:["firstName", "lastName"],
+        //     }],
+        //     where:{id:{
+        //         [Op.gt]:1
+        //     }}
+        // }); 
+
+        //fetching users
+        const data = await User.findAll({
+            attributes:["firstName", "lastName"],
+            include:[{
+                model:Contact,
+                attributes:["permanant_address", "current_address"]
+            }],
+            where:{id:{
+                [Op.gt]:1
+            }}
+        });
+        res.status(200).json({data:data}); 
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});    
+    }
+} 
+
+const paranoidUser = async(req,res)=>{
+    try {
+        // const data = await User.create({firstName:"shyam", lastName:"kumar"});
+
+        //soft delete for paranoid table User
+        // const data = await User.destroy({
+        //     where:{
+        //         id:3
+        //     },
+        //     // force:true //hard delete
+        // });
+
+        //restore the soft deleted entry
+        // const data  = await User.restore({
+        //     where:{
+        //         id:3
+        //     }
+        // })
+
+        //fetch the paranoid records
+        const data = await User.findAll({paranoid:false})
+        // const data = await User.findAll({})
+        res.status(200).json({data:data});     
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});        
+    }
+}
+
+const loadingUser = async(req,res)=>{
+    try {
+        // const data = await User.create({firstName:"Arun", lastName:"kumar"});
+        // if(data && data.id){
+        //     await Contact.create({
+        //         permanant_address:"noida",
+        //         current_address:"hapur",
+        //         UserId:data.id
+        //     })
+        // }
+
+        //EAGER LOADING
+        // const data = await User.findOne({
+        //     where:{
+        //         id:2
+        //     },
+        //     include:Contact
+        // });
+
+        //LAZY LOADING
+        const data = await User.findAll({
+            where:{
+                id:{
+                    [Op.gte]:1
+                }
+            }
+        });
+        let contactDataArray=[];
+        for(const userData of data){
+            const _contactData = await userData.getContacts();
+            contactDataArray.push(_contactData);
+        }
+        
+        // const contactData = await data.getContacts()
+        res.status(200).json({data:data, contactData:contactDataArray});
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});     
+    }
+}
+
 module.exports={
     addUser,
     getUsers,
@@ -215,5 +472,13 @@ module.exports={
     deleteUser,
     patchUser,
     queryUser,
-    findersUsers
+    findersUsers,
+    getSetVirtual,
+    validateUser,
+    rawQueries,
+    oneToOneUser,
+    oneToManyUser,
+    manyToManyUser,
+    paranoidUser,
+    loadingUser
 }

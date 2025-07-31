@@ -32,6 +32,22 @@ app.get("/query", userCtrl.queryUser)
 
 app.get("/finders", userCtrl.findersUsers);
 
+app.get("/get-set-virtual", userCtrl.getSetVirtual)
+
+app.get("/validate", userCtrl.validateUser);
+
+app.get("/raw-queries", userCtrl.rawQueries)
+
+app.get("/one-to-one", userCtrl.oneToOneUser)
+
+app.get("/one-to-many", userCtrl.oneToManyUser);
+
+app.get("/many-to-many", userCtrl.manyToManyUser)
+
+app.get("/paranoid", userCtrl.paranoidUser)
+
+app.get("/loading", userCtrl.loadingUser)
+
 //temp
 // User.sync({force:true});
 // Contact.sync({force:true})

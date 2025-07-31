@@ -3,11 +3,35 @@ module.exports = (sequelize, DataTypes) =>{
         //Models attributions are defined here
         firstName:{
             type:DataTypes.STRING,
-            allowNull:false
+            allowNull:false,
+            unique:true,
+            validate:{
+                isAlpha:true,
+            },
+            get(){
+                const rawValue = this.getDataValue("firstName");
+                return rawValue ? rawValue.toUpperCase():null
+            },
+            set(value){
+               this.setDataValue("firstName", value.toLowerCase()) 
+            }
         },
         lastName:{
             type: DataTypes.STRING,
-            defaultValue:'Jones'
+            defaultValue:'Jones',
+            get(){
+                const rawValue = this.getDataValue("lastName");
+                return rawValue ? rawValue.toUpperCase():null
+            },
+            validate:{
+                isLowercase:true
+            }
+        },
+        fullName:{
+            type:DataTypes.VIRTUAL,
+            get(){
+                return `${this.firstName} ${this.lastName}`
+            }
         }
     },{
         //other model options go here
@@ -16,6 +40,8 @@ module.exports = (sequelize, DataTypes) =>{
         // timestamps:false,
         // createdAt:false,
         // updatedAt:true
+        paranoid:true,
+        deletedAt:"soft_delete"
     });
     return User;
 }
