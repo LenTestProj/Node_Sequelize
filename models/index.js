@@ -2,7 +2,7 @@ const {Sequelize, DataTypes, Model} = require("sequelize");
 const sequelize = new Sequelize("employee_db","root","root",{
     host:"localhost",
     dialect:'mysql',
-    logging:false
+    logging:true
 });
 
 const connectDB=async()=>{
@@ -22,6 +22,7 @@ db.sequelize = sequelize;
 
 db.user = require("./user")(sequelize,DataTypes);
 db.contact = require("./contact")(sequelize, DataTypes);
+db.education = require("./education")(sequelize, DataTypes);
 db.userContacts = require("./userContacts")(sequelize, DataTypes, db.user, db.contact)
 
 // ---- ONE-TO-ONE ----------
@@ -43,8 +44,11 @@ db.userContacts = require("./userContacts")(sequelize, DataTypes, db.user, db.co
 //     foreignKey:"user_id",
 //     as:"userDetails"
 // }); 
-db.user.hasMany(db.contact)
+db.user.hasMany(db.contact);
 db.contact.belongsTo(db.user);
+
+db.contact.hasMany(db.education);
+db.education.belongsTo(db.contact);
 
 //MANY-TO-MANY
 // db.user.belongsToMany(db.contact, {through:"user_contacts"});

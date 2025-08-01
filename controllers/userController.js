@@ -2,6 +2,7 @@ const db = require("../models");
 const {Sequelize,Op, QueryTypes} = require("sequelize");
 const User = db.user;
 const Contact = db.contact;
+const Education = db.education;
 
 const addUser = async (req,res) =>{
     // const newUser = User.build({firstName:'jane'});
@@ -463,6 +464,55 @@ const loadingUser = async(req,res)=>{
     }
 }
 
+const eagerUser = async(req,res)=>{
+    try {
+        const data = await User.findAll({
+            include:{
+                model:Contact,
+                include:{
+                    model:Education,
+                    where:{
+                        id:1
+                    }
+                },
+                where:{
+                    id:2
+                }
+            },
+            where:{
+                id:{
+                    [Op.gt]:1
+                }
+            }     
+        });
+        // const data = await User.findAll({
+        //     include:[{
+        //         model:Contact,
+        //         required:false, //left inner joiin bu default left outer join
+        //         right:true
+        //     },{
+        //         model:Education
+        //     }],
+        //     where:{
+        //         id:{
+        //             [Op.gt]:1
+        //         }
+        //     }     
+        // });
+        res.status(200).json({data:data})    
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});         
+    }
+}
+
+const creatorUser=async(req,res)=>{
+    try {
+        
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});    
+    }    
+}
+
 module.exports={
     addUser,
     getUsers,
@@ -480,5 +530,7 @@ module.exports={
     oneToManyUser,
     manyToManyUser,
     paranoidUser,
-    loadingUser
+    loadingUser,
+    eagerUser,
+    creatorUser
 }

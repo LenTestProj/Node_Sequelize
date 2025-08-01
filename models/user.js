@@ -1,3 +1,5 @@
+const { logger } = require("sequelize/lib/utils/logger");
+
 module.exports = (sequelize, DataTypes) =>{
     const User = sequelize.define("User",{
         //Models attributions are defined here
@@ -41,7 +43,7 @@ module.exports = (sequelize, DataTypes) =>{
         // createdAt:false,
         // updatedAt:true
         paranoid:true,
-        deletedAt:"soft_delete"
+        deletedAt:"soft_delete",
     });
     return User;
 }

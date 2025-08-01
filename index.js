@@ -48,6 +48,10 @@ app.get("/paranoid", userCtrl.paranoidUser)
 
 app.get("/loading", userCtrl.loadingUser)
 
+app.get("/eager", userCtrl.eagerUser)
+
+app.get("/creator", userCtrl.creatorUser)
+
 //temp
 // User.sync({force:true});
 // Contact.sync({force:true})
