@@ -2,7 +2,7 @@ const {Sequelize, DataTypes, Model} = require("sequelize");
 const sequelize = new Sequelize("employee_db","root","root",{
     host:"localhost",
     dialect:'mysql',
-    logging:true
+    logging:false
 });
 
 const connectDB=async()=>{
@@ -24,6 +24,14 @@ db.user = require("./user")(sequelize,DataTypes);
 db.contact = require("./contact")(sequelize, DataTypes);
 db.education = require("./education")(sequelize, DataTypes);
 db.userContacts = require("./userContacts")(sequelize, DataTypes, db.user, db.contact)
+db.customer = require("./customer")(sequelize, DataTypes);
+db.profile = require("./profile")(sequelize, DataTypes);
+const User_Profile = sequelize.define("User_Profile",{
+    selfGranted:{type:DataTypes.BOOLEAN}
+}, {timestamps:false});
+
+db.customer.belongsToMany(db.profile,{through: User_Profile} );
+db.profile.belongsToMany(db.customer,{through:User_Profile} );
 
 // ---- ONE-TO-ONE ----------
 // db.user.hasOne(db.contact, {
@@ -44,8 +52,8 @@ db.userContacts = require("./userContacts")(sequelize, DataTypes, db.user, db.co
 //     foreignKey:"user_id",
 //     as:"userDetails"
 // }); 
-db.user.hasMany(db.contact);
-db.contact.belongsTo(db.user);
+db.user.hasMany(db.contact,{foreignKey: "userId"});
+db.contactUser = db.contact.belongsTo(db.user,{foreignKey: "userId" ,as:"users"});
 
 db.contact.hasMany(db.education);
 db.education.belongsTo(db.contact);

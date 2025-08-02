@@ -507,7 +507,51 @@ const eagerUser = async(req,res)=>{
 
 const creatorUser=async(req,res)=>{
     try {
-        
+        // const data = await User.create({firstName:"arun", lastName:"gumar"});
+        // if(data && data.id){
+        //     await Contact.create({
+        //         permanant_address:"noida",
+        //         current_address:"hapur",
+        //         UserId:data.id
+        //     })
+        // }
+
+        //BULK CREATE EXAMPLE
+        // await Contact.bulkCreate([{
+        //     permanant_address:"abc",
+        //     current_address:"def",
+        //     users:{
+        //         firstName:"shayam",
+        //         lastName:"kumar"
+        //     }
+        // },{
+        //     permanant_address:"mno",
+        //     current_address:"xyz",
+        //     users:{
+        //         firstName:"mohan",
+        //         lastName:"kumar"
+        //     } 
+        // }],{
+        //     include:[db.contactUser]
+        // })
+
+        //CREATE EXAMPLE
+        await Contact.create({
+            permanant_address:"abc",
+            current_address:"def",
+            users:{
+                firstName:"suraj",
+                lastName:"kumar"
+            }
+        },{
+            include:[db.contactUser]
+        })
+        const data = await User.findAll({
+            include:{
+                model:Contact
+            }
+        })
+        res.status(200).json({data:data});
     } catch (error) {
         res.status(400).send({message:error.message,error:error});    
     }    
