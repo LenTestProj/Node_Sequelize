@@ -1,7 +1,6 @@
 module.exports = (sequelize, DataTypes)=>{
     const Profile = sequelize.define('Profiles',{
-        username:DataTypes.STRING,
-        points:DataTypes.INTEGER
+        name:DataTypes.STRING,
     },{
        timestamps:true
     });

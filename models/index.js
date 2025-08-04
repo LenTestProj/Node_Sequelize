@@ -26,12 +26,41 @@ db.education = require("./education")(sequelize, DataTypes);
 db.userContacts = require("./userContacts")(sequelize, DataTypes, db.user, db.contact)
 db.customer = require("./customer")(sequelize, DataTypes);
 db.profile = require("./profile")(sequelize, DataTypes);
-const User_Profile = sequelize.define("User_Profile",{
-    selfGranted:{type:DataTypes.BOOLEAN}
-}, {timestamps:false});
+// const User_Profile = sequelize.define("User_Profile",{
+//     id: {
+//         type: DataTypes.INTEGER,
+//         primaryKey: true,
+//         autoIncrement: true,
+//         allowNull: false,
+//     },
+//     selfGranted:{type:DataTypes.BOOLEAN}
+// }, {timestamps:false})
 
-db.customer.belongsToMany(db.profile,{through: User_Profile} );
-db.profile.belongsToMany(db.customer,{through:User_Profile} );
+//GRANT
+const Grant = sequelize.define("grant",{
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+    },
+    selfGranted:{type:DataTypes.BOOLEAN, defaultValue:false}
+}, {timestamps:false});
+db.grant = Grant;
+
+db.customer.belongsToMany(db.profile,{through: Grant, uniqueKey:"my_custom_unique"} );
+db.profile.belongsToMany(db.customer,{through:Grant} );
+
+
+// db.customer.belongsToMany(db.profile,{through: Grant, uniqueKey:"my_custom_unique"} );
+// db.profile.belongsToMany(db.customer,{through:Grant} );
+
+//many to many alternative
+// db.customer.hasMany(Grant);
+// Grant.belongsTo(db.customer);
+
+// db.profile.hasMany(Grant);
+// Grant.belongsTo(db.profile);
 
 // ---- ONE-TO-ONE ----------
 // db.user.hasOne(db.contact, {
@@ -67,7 +96,8 @@ db.education.belongsTo(db.contact);
 
 const syncDatabse=async()=>{
     try {
-        await db.sequelize.sync(); 
+         await db.sequelize.sync(); 
+        // await db.sequelize.sync({force:true}); 
     } catch (error) {
         console.log("Error occured while syncing database: ",error);
     }

@@ -52,6 +52,10 @@ app.get("/eager", userCtrl.eagerUser)
 
 app.get("/creator", userCtrl.creatorUser)
 
+app.get("/m-n-associations", userCtrl.mnAssociationsUser);
+
+app.get("/m-n-assocations-two", userCtrl.mnAssociationsUser2);
+
 //temp
 // User.sync({force:true});
 // Contact.sync({force:true})

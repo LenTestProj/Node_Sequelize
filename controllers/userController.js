@@ -3,6 +3,7 @@ const {Sequelize,Op, QueryTypes} = require("sequelize");
 const User = db.user;
 const Contact = db.contact;
 const Education = db.education;
+const Grant = db.grant;
 
 const addUser = async (req,res) =>{
     // const newUser = User.build({firstName:'jane'});
@@ -557,6 +558,81 @@ const creatorUser=async(req,res)=>{
     }    
 }
 
+const mnAssociationsUser=async(req,res)=>{
+    try {
+        //EAGER LOADING
+        // const customer = await db.customer.create({
+        //     username:"p4dm4",
+        //     points:500,
+        //     Profiles:[{
+        //         name:"King",
+        //         User_Profile:{
+        //             selfGranted:true
+        //         }
+        //     }]
+        // },{
+        //     include:db.profile
+        // })
+
+        // LAZY LOADING
+        // const customer = await db.customer.create({username:"p4dm3", points:1000});
+        // const profile = await db.profile.create({name:"Queen"});
+        // await customer.addProfile(profile, {through: {selfGranted:false}});
+
+        const result = await db.customer.findOne({
+            where:{username:"p4dm4"},
+            include:db.profile
+        });
+        res.status(200).json({data:result});
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});
+    }
+}
+
+const mnAssociationsUser2=async(req,res)=>{
+    try {
+        //EAGER LOADING
+        // const customer = await db.customer.create({
+        //     username:"p4dm3",
+        //     points:1000,
+        //     Profiles:[{
+        //         name:"Queen",
+        //         User_Profile:{
+        //             selfGranted:true
+        //         }
+        //     }]
+        // },{
+        //     include:db.profile
+        // })
+
+        // LAZY LOADING
+        // const customer = await db.customer.create({username:"p4dm3", points:1000});
+        // const profile = await db.profile.create({name:"Queen"});
+        // await customer.addProfile(profile, {through: {selfGranted:false}});
+
+        // const result = await db.customer.findAll({
+        //     include:{
+        //         model:Grant,
+        //         include:db.profile
+        //     }
+        // });
+        const result = await db.customer.findOne({
+            where:{username:"p4dm3"},
+            include:{
+                model:db.profile,
+                through:{
+                    // attributes: { exclude: ["selfGranted"] }
+                    // attributes:["selfGranted"]
+                    attributes:[]
+                }
+            }
+        });
+        res.status(200).json({data:result});
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});
+    }
+}
+
 module.exports={
     addUser,
     getUsers,
@@ -576,5 +652,7 @@ module.exports={
     paranoidUser,
     loadingUser,
     eagerUser,
-    creatorUser
+    creatorUser,
+    mnAssociationsUser,
+    mnAssociationsUser2
 }
