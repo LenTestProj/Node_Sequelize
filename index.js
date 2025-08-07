@@ -56,6 +56,8 @@ app.get("/m-n-associations", userCtrl.mnAssociationsUser);
 
 app.get("/m-n-assocations-two", userCtrl.mnAssociationsUser2);
 
+app.get("/many-to-many-to-many", userCtrl.m2m2mUser);
+
 //temp
 // User.sync({force:true});
 // Contact.sync({force:true})
