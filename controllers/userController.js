@@ -692,6 +692,50 @@ const m2m2mUser=async(req,res)=>{
     }
 }
 
+const transactionsUser=async(req,res)=>{
+    const t = await db.sequelize.transaction();
+    let data={};
+    try {
+        data = await User.create({firstName:"arun", lastName:"gupta"},{transaction:t});
+        if(data && data.id){
+            // throw new Error();
+            await Contact.create({
+                permanant_address:"noida",
+                current_address:"hapur",
+                user_id:data.id
+            },{transaction:t});
+            await t.commit();
+        }
+        res.status(200).json({data:data})
+    } catch (error) {
+        data["transaction_status"]="rollback"
+        res.status(400).send({message:error.message,error:error,data});     
+        await t.rollback();
+    }
+}
+
+const withTransactionsUser=async(req,res)=>{
+    const t = await db.sequelize.transaction();
+    let data={};
+    try {
+        data = await User.create({firstName:"arun", lastName:"gupta"},{transaction:t});
+        if(data && data.id){
+            // throw new Error();
+            await Contact.create({
+                permanant_address:"noida",
+                current_address:"hapur",
+                user_id:data.id
+            },{transaction:t});
+            await t.commit();
+        }
+        res.status(200).json({data:data})
+    } catch (error) {
+        data["transaction_status"]="rollback"
+        res.status(400).send({message:error.message,error:error,data});     
+        await t.rollback();
+    }
+}
+
 module.exports={
     addUser,
     getUsers,
@@ -714,5 +758,6 @@ module.exports={
     creatorUser,
     mnAssociationsUser,
     mnAssociationsUser2,
-    m2m2mUser
+    m2m2mUser,
+    transactionsUser
 }
