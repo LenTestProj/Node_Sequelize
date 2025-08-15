@@ -736,6 +736,58 @@ const withTransactionsUser=async(req,res)=>{
     }
 }
 
+const scopesUser = async(req,res)=>{
+    try {
+        // const data = await User.create({firstName:"mohit", lastName:"kumar",status:1});
+        // if(data && data.id){
+        //     await Contact.create({
+        //         permanant_address:"noida",
+        //         current_address:"hapur",
+        //         userId:data.id
+        //     })
+        // }
+
+        // User.addScope("checkStatus",{
+        //     where:{
+        //         status:0
+        //     }
+        // });
+        // User.addScope("firstNameCheck",{
+        //     where:{
+        //         lastName:{
+        //             [Op.like]:"%kumar%"
+        //         }
+        //     }
+        // });
+
+        // delete User.options.scopes['checkStatus'];
+        // delete User.options.scopes['firstNameCheck'];
+
+        User.addScope("includeContact",{
+            include:({
+                model:Contact,
+                attributes:["current_address"]
+            })
+        }
+        );
+
+        User.addScope("userAttributes",{
+            attributes:["firstName"]
+        })
+
+        User.addScope("limitApply",{
+            limit:1
+        })
+
+        const data = await User.scope(["includeContact","userAttributes","limitApply"]).findAll();
+
+        console.log(JSON.stringify(User.options.scopes, null, 2));
+        res.status(200).json({data:data});
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});    
+    }
+}
+
 module.exports={
     addUser,
     getUsers,
@@ -759,5 +811,6 @@ module.exports={
     mnAssociationsUser,
     mnAssociationsUser2,
     m2m2mUser,
-    transactionsUser
+    transactionsUser,
+    scopesUser
 }

@@ -34,7 +34,8 @@ module.exports = (sequelize, DataTypes) =>{
             get(){
                 return `${this.firstName} ${this.lastName}`
             }
-        }
+        },
+        status:DataTypes.INTEGER
     },{
         //other model options go here
         // modelName:"User"
