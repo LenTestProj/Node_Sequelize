@@ -133,7 +133,7 @@ db.gameTeam.hasMany(db.playerGameTeam);
 
 const syncDatabse=async()=>{
     try {
-         await db.sequelize.sync({force:true}); 
+         await db.sequelize.sync(); 
         // await db.sequelize.sync({force:true}); 
     } catch (error) {
         console.log("Error occured while syncing database: ",error);

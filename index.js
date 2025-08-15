@@ -58,7 +58,10 @@ app.get("/m-n-assocations-two", userCtrl.mnAssociationsUser2);
 
 app.get("/many-to-many-to-many", userCtrl.m2m2mUser);
 
-app.get("/transactionsUser", userCtrl.transactionsUser)
+app.get("/transactionsUser", userCtrl.transactionsUser);
+
+app.get("/withTransactionsUser", userCtrl.withTransactionsUser)
+
 app.get("/scopesUser", userCtrl.scopesUser);
 
 //temp

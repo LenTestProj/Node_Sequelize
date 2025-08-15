@@ -715,24 +715,41 @@ const transactionsUser=async(req,res)=>{
 }
 
 const withTransactionsUser=async(req,res)=>{
-    const t = await db.sequelize.transaction();
     let data={};
     try {
-        data = await User.create({firstName:"arun", lastName:"gupta"},{transaction:t});
-        if(data && data.id){
-            // throw new Error();
-            await Contact.create({
-                permanant_address:"noida",
-                current_address:"hapur",
-                user_id:data.id
-            },{transaction:t});
-            await t.commit();
-        }
+        db.sequelize.transaction(async(t)=>{
+            // data = await User.create({firstName:"anish", lastName:"gupta"},{transaction:t});
+            // if(data && data.id){
+            //     // throw new Error();
+            //     // await Contact.create({
+            //     //     permanant_address:"noida",
+            //     //     current_address:"hapur",
+            //     //     userId:data.id
+            //     // },{transaction:t});
+
+            //     // data=await Contact.bulkCreate([{
+            //     //     permanant_address:"nnoida", current_address:"hapur", UserId:data.id
+            //     // },{
+            //     //     permanant_address:"delhi", current_address:"meerut", UserId:null   
+            //     // }])
+
+
+            // }
+            data = await Contact.create({
+                permanant_address:"hapur",
+                current_address:"noida",
+                users:{
+                    firstName:"ranaj",
+                    lastName:"kumar"
+                }
+            },{
+                include:[db.contactUser]
+            })
+        });
         res.status(200).json({data:data})
     } catch (error) {
         data["transaction_status"]="rollback"
         res.status(400).send({message:error.message,error:error,data});     
-        await t.rollback();
     }
 }
 
@@ -812,5 +829,6 @@ module.exports={
     mnAssociationsUser2,
     m2m2mUser,
     transactionsUser,
+    withTransactionsUser,
     scopesUser
 }

@@ -8,9 +8,10 @@ module.exports = (sequelize, DataTypes)=>{
             type:DataTypes.STRING,
             allowNull:false
         },
-        // user_Id:{
-        //     type:DataTypes.INTEGER
-        // }
+        userId:{
+            type:DataTypes.INTEGER,
+            allowNull:false
+        }
     },{
         //other optional options go here
     });
