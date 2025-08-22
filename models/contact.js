@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes)=>{
             allowNull:false
         }
     },{
+        underscored:true
         //other optional options go here
     });
     return Contact;

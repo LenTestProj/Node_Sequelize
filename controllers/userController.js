@@ -805,6 +805,15 @@ const scopesUser = async(req,res)=>{
     }
 }
 
+const hooksUser=async(req,res)=>{
+    try {
+        const data = await User.create({firstName:"manoj", lastName:"singh"});
+        res.status(200).json({data:data}); 
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});    
+    }
+}
+
 module.exports={
     addUser,
     getUsers,
@@ -830,5 +839,6 @@ module.exports={
     m2m2mUser,
     transactionsUser,
     withTransactionsUser,
-    scopesUser
+    scopesUser,
+    hooksUser
 }

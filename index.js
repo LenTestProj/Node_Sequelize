@@ -64,6 +64,8 @@ app.get("/withTransactionsUser", userCtrl.withTransactionsUser)
 
 app.get("/scopesUser", userCtrl.scopesUser);
 
+app.get("/hooks", userCtrl.hooksUser);
+
 //temp
 // User.sync({force:true});
 // Contact.sync({force:true})

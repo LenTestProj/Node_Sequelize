@@ -37,6 +37,7 @@ module.exports = (sequelize, DataTypes) =>{
         },
         status:DataTypes.INTEGER
     },{
+        underscored:true,
         //other model options go here
         // modelName:"User"
         tableName:"users",
@@ -45,6 +46,33 @@ module.exports = (sequelize, DataTypes) =>{
         // updatedAt:true
         paranoid:true,
         deletedAt:"soft_delete",
+        hooks:{
+            // beforeValidate:(user,options)=>{
+            //     user.firstName="Happy"
+            //     console.log("before validate ", user.firstName);
+            // },
+            // afterValidate:(user,options)=>{
+            //     user.status=1;
+            //     console.log("after validate ",user.firstName);
+            // }
+        }
     });
+
+    // User.addHook("beforeValidate",(user,options)=>{
+    //     user.lastName="Singha";
+    // })
+
+    // User.addHook("afterValidate", (user,options)=>{
+    //     user.status=1;
+    // })
+
+    User.beforeValidate(async(user,options)=>{
+        user.lastName="singha";
+    })
+
+    User.afterValidate(async(user,options)=>{
+        user.status=1;
+    })
+
     return User;
 }

@@ -20,8 +20,8 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.user = require("./user")(sequelize,DataTypes);
 db.contact = require("./contact")(sequelize, DataTypes);
+db.user = require("./user")(sequelize,DataTypes);
 db.education = require("./education")(sequelize, DataTypes);
 db.userContacts = require("./userContacts")(sequelize, DataTypes, db.user, db.contact)
 db.customer = require("./customer")(sequelize, DataTypes);
@@ -81,13 +81,16 @@ db.profile.belongsToMany(db.customer,{through:Grant} );
 //     foreignKey:"user_id",
 //     as:"userDetails"
 // }); 
-db.user.hasMany(db.contact,{foreignKey: "userId"});
-db.contactUser = db.contact.belongsTo(db.user,{foreignKey: "userId" ,as:"users"});
+// db.user.hasMany(db.contact,{foreignKey: "userId"});
+// db.contactUser = db.contact.belongsTo(db.user,{foreignKey: "userId" ,as:"users"});
+
+db.user.hasMany(db.contact);
+db.contactUser = db.contact.belongsTo(db.user);
 
 db.contact.hasMany(db.education);
 db.education.belongsTo(db.contact);
 
-//MANY-TO-MANY
+//MANY-TO-MANY 
 // db.user.belongsToMany(db.contact, {through:"user_contacts"});
 // db.contact.belongsToMany(db.user, {through:"user_contacts"})
 
@@ -133,8 +136,10 @@ db.gameTeam.hasMany(db.playerGameTeam);
 
 const syncDatabse=async()=>{
     try {
-         await db.sequelize.sync(); 
-        // await db.sequelize.sync({force:true}); 
+        await db.sequelize.sync({force:true});  
+        // await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
+        // await sequelize.sync({ force: true });
+        // await sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
     } catch (error) {
         console.log("Error occured while syncing database: ",error);
     }
