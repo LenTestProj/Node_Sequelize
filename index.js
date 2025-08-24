@@ -66,6 +66,14 @@ app.get("/scopesUser", userCtrl.scopesUser);
 
 app.get("/hooks", userCtrl.hooksUser);
 
+app.get("/polyOneToMany", userCtrl.polyOneToMany);
+
+app.get('/polyManyToMany', userCtrl.polyManyToMany)
+
+app.get("*",(req,res,next)=>{
+    res.status(404).send("Not found")
+})
+
 //temp
 // User.sync({force:true});
 // Contact.sync({force:true})

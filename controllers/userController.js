@@ -4,6 +4,11 @@ const User = db.user;
 const Contact = db.contact;
 const Education = db.education;
 const Grant = db.grant;
+const Image = db.image;
+const Video=db.video;
+const Comment=db.comment;
+const Tag = db.tag;
+const TagTaggable = db.tagTaggable;
 
 const addUser = async (req,res) =>{
     // const newUser = User.build({firstName:'jane'});
@@ -814,6 +819,87 @@ const hooksUser=async(req,res)=>{
     }
 }
 
+const polyOneToMany=async(req,res)=>{
+    try {
+        let imageData, videoData;
+        // await db.sequelize.transaction(async(t)=>{
+        //     // const imageData = await Image.create({title:"First Image", url:"first_url"},{transaction:t});
+        //     videoData = await Video.create({title:"First Video", text:"Awesome video"},{transaction:t});
+        //     if(imageData?.id){
+        //         await Comment.create({title:"First Comment for image", commentableId:imageData.id,commentableType:'image'},{transaction:t});
+        //     }
+        //     if(videoData?.id){
+        //         await Comment.create({title:"Second Comment for video", commentableId:videoData.id,commentableType:'video'},{transaction:t});
+        //     }
+        // }); 
+        
+        //image to comment - fetch
+        // imageData = await Image.findAll({
+        //     include:[{
+        //         model:Comment
+        //     }]
+        // })
+
+        //video to comment -fetch
+        // videoData = await Video.findAll({
+        //     include:[{
+        //         model:Comment
+        //     }]
+        // })
+
+        //fetch only commments that have video id associated with it even thoiugh we did not specifgy the where condition type = vdieo.
+        
+        const commentVideoData = await Comment.findAll({
+           include:[{
+            model:Video
+           }],
+           where:{
+            commentableType:'video'
+           } 
+        });
+
+        const commentImageData = await Comment.findAll({
+               include:[{
+                    model:Image,
+                }],
+                where:{commentableType:'image'}     
+            });
+
+        res.status(200).json({data:{imageData:imageData??null,videoData:videoData??null,
+        commentData:{
+            commentImageData,
+            commentVideoData
+        }}});
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});    
+    }
+}
+
+const polyManyToMany=async(req,res)=>{
+    try {
+        let imageData,videoData,tagData;
+        await db.sequelize.transaction(async(t)=>{
+            imageData = await Image.create({title:"First Image", url:"first_url"},{transaction:t}); 
+
+            videoData = await Video.create({title:"First Video", text:"Awesome video"},{transaction:t});  
+            tagData = await Tag.create({name:'nodejs'});
+
+            if(tagData?.id && imageData?.id){
+                await TagTaggable.create({tagId:tagData?.id,
+                taggableId:imageData.id, taggableType:'image'});
+            }
+
+            if(tagData?.id && videoData?.id){
+                await TagTaggable.create({tagId:tagData?.id,
+                    taggableId:videoData.id, taggableType:'video'});
+            }
+        });
+        res.status(200).json({imageData:imageData??null,videoData:videoData??null, tagData:tagData??null})
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});       
+    }
+}
+
 module.exports={
     addUser,
     getUsers,
@@ -840,5 +926,7 @@ module.exports={
     transactionsUser,
     withTransactionsUser,
     scopesUser,
-    hooksUser
+    hooksUser,
+    polyOneToMany,
+    polyManyToMany
 }

@@ -1,4 +1,5 @@
 const {Sequelize, DataTypes, Model} = require("sequelize");
+const tag_taggable = require("./tag_taggable");
 const sequelize = new Sequelize("employee_db","root","root",{
     host:"localhost",
     dialect:'mysql',
@@ -134,9 +135,76 @@ db.playerGameTeam.belongsTo(db.gameTeam);
 db.player.hasMany(db.playerGameTeam);
 db.gameTeam.hasMany(db.playerGameTeam);
 
+//polymorphic associations
+db.image = require("./image")(sequelize, DataTypes,Model);
+db.video = require("./video")(sequelize, DataTypes,Model);
+db.comment = require("./comment")(sequelize, DataTypes,Model);
+db.tag = require("./tag.js")(sequelize, DataTypes,Model);
+db.tagTaggable = require("./tag_taggable")(sequelize, DataTypes,Model);
+
+db.image.hasMany(db.comment, {
+    foreignKey: 'commentableId',
+    constraints:false,
+    scope:{
+        commentableType:'image'
+    }
+});
+db.comment.belongsTo(db.image, {foreignKey:'commentableId', constraints:false});
+
+db.video.hasMany(db.comment, {
+    foreignKey: 'commentableId',
+    constraints:false,
+    scope:{
+        commentableType:'video'
+    }
+});
+db.comment.belongsTo(db.video, {foreignKey:'commentableId', constraints:false});
+
+
+
+//many to many polymorphic associations
+db.image.belongsToMany(db.tag, {
+    through:{
+        model:db.tagTaggable,
+        unique:false,
+        scope:{
+            taggableType:'image'
+        },
+    },
+    foreignKey:'taggableId',
+    constraints:false
+});
+db.video.belongsToMany(db.tag, {
+    through:{
+        model:db.tagTaggable,
+        unique:false,
+        scope:{
+            taggableType:'video'
+        },
+    },
+    foreignKey:'taggableId',
+    constraints:false
+});
+db.tag.belongsToMany(db.image,{
+    through:{
+        model:db.tagTaggable,
+        unique:false
+    },
+    foreignKey:'tagId',
+    constraints: false
+})
+db.tag.belongsToMany(db.video,{
+    through:{
+        model:db.tagTaggable,
+        unique:false
+    },
+    foreignKey:'tagId',
+    constraints: false
+})
+
 const syncDatabse=async()=>{
     try {
-        await db.sequelize.sync({force:true});  
+        await db.sequelize.sync()  
         // await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
         // await sequelize.sync({ force: true });
         // await sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
