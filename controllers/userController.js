@@ -877,24 +877,39 @@ const polyOneToMany=async(req,res)=>{
 
 const polyManyToMany=async(req,res)=>{
     try {
-        let imageData,videoData,tagData;
-        await db.sequelize.transaction(async(t)=>{
-            imageData = await Image.create({title:"First Image", url:"first_url"},{transaction:t}); 
+        // let imageData,videoData,tagData;
+        // await db.sequelize.transaction(async(t)=>{
+        //     imageData = await Image.create({title:"First Image", url:"first_url"},{transaction:t}); 
 
-            videoData = await Video.create({title:"First Video", text:"Awesome video"},{transaction:t});  
-            tagData = await Tag.create({name:'nodejs'});
+        //     videoData = await Video.create({title:"First Video", text:"Awesome video"},{transaction:t}); 
 
-            if(tagData?.id && imageData?.id){
-                await TagTaggable.create({tagId:tagData?.id,
-                taggableId:imageData.id, taggableType:'image'});
-            }
+        //     tagData = await Tag.create({name:'nodejs'},{
+        //         transaction:t
+        //     });
 
-            if(tagData?.id && videoData?.id){
-                await TagTaggable.create({tagId:tagData?.id,
-                    taggableId:videoData.id, taggableType:'video'});
-            }
+        //     if(tagData?.id && imageData?.id){
+        //         await TagTaggable.create({tagId:tagData?.id,
+        //         taggableId:imageData.id, taggableType:'image'},{transaction:t});
+        //     }
+
+        //     if(tagData?.id && videoData?.id){
+        //         await TagTaggable.create({tagId:tagData?.id,
+        //             taggableId:videoData.id, taggableType:'video'},{transaction:t});
+        //     }
+        // });
+        // res.status(200).json({imageData:imageData??null,videoData:videoData??null, tagData:tagData??null})
+
+        const iamgeData = await Image.findAll({
+            include:[Tag]
         });
-        res.status(200).json({imageData:imageData??null,videoData:videoData??null, tagData:tagData??null})
+        const videoData = await Video.findAll({
+            include:[Tag]
+        })
+        const tagData = await Tag.findAll({
+            include:[Image,Video]
+        });
+
+        res.status(200).json({data:{iamgeData,videoData, tagData}});
     } catch (error) {
         res.status(400).send({message:error.message,error:error});       
     }

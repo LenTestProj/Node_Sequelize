@@ -3,20 +3,33 @@ module.exports=(sequelize, DataTypes,Model) => {
     Tag_Taggable.init({
         tagId:{
             type:DataTypes.INTEGER,
-            unique:'tt_unique_constraint'
+            allowNull:false,
+            primaryKey:true
+            // unique:'tt_unique_constraint'
         },
         taggableId: {
             type:DataTypes.INTEGER,
-            unique:'tt_unique_constraint',
+            allowNull:false,
+            primaryKey:true,
+            // unique:'tt_unique_constraint',
             references:null
         },
         taggableType:{
             type:DataTypes.STRING,
-            unique:'tt_unique_constraint',
+            allowNull:false,
+            primaryKey:true
+            // unique:'tt_unique_constraint',
         }
     },{
         sequelize, 
-        modelName: 'tag_taggable'
+        modelName: 'tag_taggable',
+        timestamps:true,
+        indexes:[
+            {
+                unique:true,
+                fields:["tagId","taggableId","taggableType"]
+            }
+        ]
     });
     return Tag_Taggable;
 }
