@@ -1,5 +1,5 @@
 const db = require("../models");
-const {Sequelize,Op, QueryTypes} = require("sequelize");
+const {Sequelize,Op, QueryTypes, DataTypes} = require("sequelize");
 const User = db.user;
 const Contact = db.contact;
 const Education = db.education;
@@ -915,6 +915,42 @@ const polyManyToMany=async(req,res)=>{
     }
 }
 
+const queryInterfaceusers=async(req,res)=>{
+    try {
+        const data = {};
+        const queryInterface = db.sequelize.getQueryInterface();
+        // await queryInterface.createTable('Person',{
+        //     name:DataTypes.STRING,
+        //     isBetaMember:{
+        //         type:DataTypes.BOOLEAN,
+        //         defaultValue:false,
+        //         allowNull:false
+        //     }
+        // });
+        // await queryInterface.addColumn('Person','petName',{type:DataTypes.STRING});
+
+        // await queryInterface.addColumn('Person','foo',{type:DataTypes.INTEGER})
+
+        // await queryInterface.changeColumn('Person','foo',{
+        //     type:DataTypes.FLOAT,
+        //     defaultValue:3.14,
+        //     allowNull:false
+        // })
+
+        // await queryInterface.removeColumn('Person',"petName")
+
+        res.status(200).json({data});
+    } catch (error) {
+        console.error("⚠️ Sequelize Query Error:");
+        console.error("Message:", err.message);
+        console.error("SQL:", err.sql);
+        console.error("SQL State:", err.parent?.sqlState);
+        console.error("Code:", err.parent?.code);
+        console.error("Stack:", err.stack);
+        res.status(400).send({message:error.message,error:error});    
+    }
+}
+
 module.exports={
     addUser,
     getUsers,
@@ -943,5 +979,6 @@ module.exports={
     scopesUser,
     hooksUser,
     polyOneToMany,
-    polyManyToMany
+    polyManyToMany,
+    queryInterfaceusers
 }

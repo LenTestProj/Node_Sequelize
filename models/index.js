@@ -3,7 +3,13 @@ const tag_taggable = require("./tag_taggable");
 const sequelize = new Sequelize("employee_db","root","root",{
     host:"localhost",
     dialect:'mysql',
-    logging:false
+    logging:false,
+    pool:{
+        min:0,
+        max:5,
+        acquire:30000,
+        idle:10000
+    }
 });
 
 const connectDB=async()=>{
