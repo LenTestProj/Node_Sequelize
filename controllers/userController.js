@@ -951,6 +951,56 @@ const queryInterfaceusers=async(req,res)=>{
     }
 }
 
+async function makePostWithReactions(content, reactionTypes,t){
+    const post = await db.post.create({content},{transaction:t});
+    await db.reaction.bulkCreate(
+        reactionTypes.map(type=>({type,postId:post.id})),{transaction:t}
+    );
+    return post;
+}
+
+const subQueryUsers = async(req,res)=>{
+    try {
+        let data;
+        // await db.sequelize.transaction(async(t)=>{
+        //     data = await makePostWithReactions('Hello World', [
+        //         'Like',
+        //         'Angry',
+        //         'Laugh',
+        //         'Like',
+        //         'Like',
+        //         'Angry',
+        //         'Sad',
+        //         'Like',
+        //     ],t);
+        //     await makePostWithReactions('My Second Post', ['Laugh', 'Laugh', 'Like', 'Laugh'],t);
+        // })
+        
+        data = await db.post.findAll({
+            attributes:{
+              include:[
+                [
+                    db.sequelize.literal(
+                        `
+                        (
+                           SELECT COUNT(*) FROM reactions as reaction WHERE reaction.postid = post.id AND reaction.type = "Laugh" 
+                        )`
+                    ),
+                    'laughReactionsCount'
+                ]
+              ]  
+            },
+            order:[
+                [db.sequelize.literal(`laughReactionsCount`),'DESC']
+            ]
+        })
+
+        res.status(200).json({data});
+    } catch (error) {
+        res.status(400).send({message:error.message,error:error});       
+    }
+}
+
 module.exports={
     addUser,
     getUsers,
@@ -980,5 +1030,6 @@ module.exports={
     hooksUser,
     polyOneToMany,
     polyManyToMany,
-    queryInterfaceusers
+    queryInterfaceusers,
+    subQueryUsers
 }

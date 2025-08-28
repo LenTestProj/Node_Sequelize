@@ -206,7 +206,18 @@ db.tag.belongsToMany(db.video,{
     },
     foreignKey:'tagId',
     constraints: false
-})
+});
+
+db.post = sequelize.define("post",{
+    content: DataTypes.STRING
+},{timestamps:false});
+
+db.reaction = sequelize.define('reaction',{
+    type:DataTypes.STRING
+},{timestamps:false});
+
+db.post.hasMany(db.reaction);
+db.reaction.belongsTo(db.post)
 
 const syncDatabse=async()=>{
     try {

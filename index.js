@@ -72,6 +72,8 @@ app.get('/polyManyToMany', userCtrl.polyManyToMany)
 
 app.get("/query-interface",userCtrl.queryInterfaceusers);
 
+app.get("/sub-query",userCtrl.subQueryUsers);
+
 app.get("*",(req,res,next)=>{
     res.status(404).send("Not found")
 });
